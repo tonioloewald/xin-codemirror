@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<title>xin-codemirror</title>
+<script type="module">
+  import {
+    blueprint,
+    blueprintLoader,
+    elements,
+  } from 'https://cdn.jsdelivr.net/npm/xinjs@0.8.8/dist/module.js'
+  const { protocol, host } = window.location
+
+  ;(async () => {
+    const response = await fetch('./package.json')
+    const data = await response.json()
+
+    document.title = data.name
+    const header = document.querySelector('header')
+    const { h1, div, a } = elements
+    header.append(
+      h1(data.name),
+      div(
+        a({ href: data.repository.url }, 'repo'),
+        ' | ',
+        a({ href: `https://www.npmjs.com/package/${data.name}` }, 'npm')
+      )
+    )
+  })()
+
+  // blueprintLoader
+  document.body.append(
+    blueprintLoader(
+      blueprint({
+        tag: 'xin-codemirror',
+        src:
+          host === 'tonioloewald.github.io'
+            ? // live demo
+              `https://tonioloewald.github.io/xin-codemirror/dist/blueprint.js`
+            : // local test
+              `${protocol}//${host}/dist/blueprint.js`,
+      }),
+      blueprint({
+        tag: 'xin-test',
+        src: 'https://tonioloewald.github.io/xin-test/dist/blueprint.js',
+      })
+    )
+  )
+</script>
+<link href="style.css" rel="stylesheet" />
+<header></header>
+
+<section style="display: flex; flex-direction: column">
+  <label>
+    <xin-codemirror mode="tsx" id="basic">
+      console.log('hello world')
+    </xin-codemirror>
+  </label>
+</section>
+
+<section>
+  <h2>Tests</h2>
+  <xin-test description="xin-codemirror registered" delay="100">
+    return ( document.querySelector('xin-codemirror').constructor !==
+    HTMLElement )
+  </xin-test>
+  <xin-test description="has the expected content" delay="100">
+    return document.querySelector('#basic').value.includes('console.log')
+  </xin-test>
+</section>
